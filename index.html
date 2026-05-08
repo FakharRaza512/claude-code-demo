@@ -1,0 +1,470 @@
+# index.html — Landing Page
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Intake Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f7fb;
+    }
+
+    nav {
+      background: #111827;
+      padding: 15px;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 6px;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .full {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Landing Page</a>
+  <a href="pipeline.html">Pipeline Dashboard</a>
+  <a href="status.html">Status Update</a>
+</nav>
+
+<div class="container">
+  <h1>Customer Intake Form</h1>
+
+  <form id="leadForm">
+    <div class="grid">
+      <div>
+        <label>First Name</label>
+        <input type="text" id="firstName" required />
+      </div>
+
+      <div>
+        <label>Last Name</label>
+        <input type="text" id="lastName" required />
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input type="email" id="email" required />
+      </div>
+
+      <div>
+        <label>Phone Number</label>
+        <input type="text" id="phone" required />
+      </div>
+
+      <div>
+        <label>Employee Range</label>
+        <select id="employees">
+          <option>1-3</option>
+          <option>3-5</option>
+          <option>5-10</option>
+          <option>10-25</option>
+          <option>25+</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Revenue Range</label>
+        <select id="revenue">
+          <option>$200k - $500k</option>
+          <option>$500k - $1M</option>
+          <option>Above $1M</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Appointment Date</label>
+        <input type="date" id="appointmentDate" />
+      </div>
+
+      <div>
+        <label>Appointment Time</label>
+        <input type="time" id="appointmentTime" min="08:00" max="21:00" />
+      </div>
+
+      <div class="full">
+        <label>Extra Notes</label>
+        <textarea id="notes"></textarea>
+      </div>
+    </div>
+
+    <button type="submit">Submit Lead</button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('leadForm');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const revenue = document.getElementById('revenue').value;
+    const appointmentDate = document.getElementById('appointmentDate').value;
+
+    let stage = 'lead';
+
+    if (appointmentDate) {
+      stage = 'appointment';
+    }
+
+    if (revenue === 'Above $1M') {
+      stage = 'qualified';
+    }
+
+    const lead = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      employees: document.getElementById('employees').value,
+      revenue,
+      appointmentDate,
+      appointmentTime: document.getElementById('appointmentTime').value,
+      notes: document.getElementById('notes').value,
+      stage,
+      soldAmount: ''
+    };
+
+    const leads = JSON.parse(localStorage.getItem('leads')) || [];
+    leads.push(lead);
+    localStorage.setItem('leads', JSON.stringify(leads));
+
+    alert('Lead Added Successfully!');
+    form.reset();
+  });
+</script>
+
+</body>
+</html>
+```
+
+---
+
+# pipeline.html — Pipeline Dashboard
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+    }
+
+    nav {
+      background: #111827;
+      padding: 15px;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .dashboard {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .column {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 250px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .column h2 {
+      margin-top: 0;
+    }
+
+    .card {
+      background: #f9fafb;
+      border-left: 5px solid #2563eb;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Landing Page</a>
+  <a href="pipeline.html">Pipeline Dashboard</a>
+  <a href="status.html">Status Update</a>
+</nav>
+
+<div class="dashboard" id="dashboard"></div>
+
+<script>
+  const dashboard = document.getElementById('dashboard');
+
+  const stages = [
+    'lead',
+    'appointment',
+    'qualified',
+    'sold',
+    'not interested'
+  ];
+
+  const leads = JSON.parse(localStorage.getItem('leads')) || [];
+
+  stages.forEach(stage => {
+    const column = document.createElement('div');
+    column.className = 'column';
+
+    column.innerHTML = `<h2>${stage.toUpperCase()}</h2>`;
+
+    const filtered = leads.filter(lead => lead.stage === stage);
+
+    filtered.forEach(lead => {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      card.innerHTML = `
+        <p><strong>${lead.firstName} ${lead.lastName}</strong></p>
+        <p>${lead.phone}</p>
+        <p>${lead.revenue}</p>
+        <p>${lead.appointmentDate || 'No Appointment'}</p>
+        ${lead.soldAmount ? `<p><strong>Sold:</strong> $${lead.soldAmount}</p>` : ''}
+      `;
+
+      column.appendChild(card);
+    });
+
+    dashboard.appendChild(column);
+  });
+</script>
+
+</body>
+</html>
+```
+
+---
+
+# status.html — Status Update Page
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Update</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+    }
+
+    nav {
+      background: #111827;
+      padding: 15px;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      background: #2563eb;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .customer-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Landing Page</a>
+  <a href="pipeline.html">Pipeline Dashboard</a>
+  <a href="status.html">Status Update</a>
+</nav>
+
+<div class="container">
+  <h1>Status Update</h1>
+
+  <input type="text" id="searchPhone" placeholder="Enter phone number">
+  <button onclick="findCustomer()">Search Customer</button>
+
+  <div id="customerSection"></div>
+</div>
+
+<script>
+  function findCustomer() {
+    const phone = document.getElementById('searchPhone').value;
+    const leads = JSON.parse(localStorage.getItem('leads')) || [];
+
+    const customer = leads.find(lead => lead.phone === phone);
+
+    const section = document.getElementById('customerSection');
+
+    if (!customer) {
+      section.innerHTML = '<p>Customer not found.</p>';
+      return;
+    }
+
+    section.innerHTML = `
+      <div class="customer-info">
+        <p><strong>Name:</strong> ${customer.firstName} ${customer.lastName}</p>
+        <p><strong>Email:</strong> ${customer.email}</p>
+        <p><strong>Stage:</strong> ${customer.stage}</p>
+
+        <label>Update Status</label>
+        <select id="statusSelect" onchange="toggleSoldInput()">
+          <option value="sold">Sold</option>
+          <option value="not interested">Not Interested</option>
+        </select>
+
+        <div id="soldContainer">
+          <input type="number" id="soldAmount" placeholder="Enter sold amount">
+        </div>
+
+        <button onclick="updateStatus('${customer.phone}')">Update Status</button>
+      </div>
+    `;
+  }
+
+  function toggleSoldInput() {
+    const status = document.getElementById('statusSelect').value;
+    const soldContainer = document.getElementById('soldContainer');
+
+    soldContainer.style.display = status === 'sold' ? 'block' : 'none';
+  }
+
+  function updateStatus(phone) {
+    const leads = JSON.parse(localStorage.getItem('leads')) || [];
+
+    const index = leads.findIndex(lead => lead.phone === phone);
+
+    if (index === -1) return;
+
+    const status = document.getElementById('statusSelect').value;
+    const soldAmount = document.getElementById('soldAmount').value;
+
+    leads[index].stage = status;
+
+    if (status === 'sold') {
+      leads[index].soldAmount = soldAmount;
+    }
+
+    localStorage.setItem('leads', JSON.stringify(leads));
+
+    alert('Customer updated successfully!');
+  }
+</script>
+
+</body>
+</html>
+```
+
